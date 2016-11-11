@@ -108,40 +108,59 @@
 	$files->extracerts	= $path->certs . 'ca-bundle.pem';
 
 
-
 	HELPER::printStatus('Checking all dependencies');
+	
 	// Check all dependencies
-	if(HELPER::checkDependencies($files, $xml))
-	{
-		// All dependencies exist and work properly
+	$check = HELPER::checkDependencies($files);	// Set this variable to be able to get return value all the time
+	if($check === true)
+	   {
+			HELPER::printStatus('All dependencies found');
+			HELPER::printStatus('Write data to profile');
+			if(file_put_contents($files->infile, $xml) === false)
+			{
+				die('Error while writing data');
+			}
+			// All dependencies exist and work properly
 			HELPER::printStatus('Beginn signing');
-		// Run the commandline
-		if(exec('openssl smime -sign -signer ' . $files->signcert . ' -inkey ' . $files->privkey . ' -certfile ' . $files->extracerts . ' -nodetach -outform der -in ' . $files->infile . ' -out ' . $files->outfile) == "")
-		{
-			HELPER::printStatus('Signing successful');
-			unlink($files->infile);
-		}
+			// Run the commandline
+			if(exec('openssl smime -sign -signer ' . $files->signcert . ' -inkey ' . $files->privkey . ' -certfile ' . $files->extracerts . ' -nodetach -outform der -in ' . $files->infile . ' -out ' . $files->outfile) == "")
+			{
+				HELPER::printStatus('Signing successful');
+				@unlink($files->infile);
+				HELPER::printStatus('Signed profile successfully generated');
+			}
+	   }
+	   else
+	   {
+		   // At least one necessary file is missing
+		   HELPER::debug('A necessary file is missing: ' . $check[1]);
+		   HELPER::printStatus('Not all dependencies found');
+		   if($check[1] != 'infile')
+		   {
+			   // Write data to raw file
+			   HELPER::printStatus('Write data to profile');
+			   if(file_put_contents($files->infile, $xml) === false)
+			   {
+				   die('Error while writing data');
+			   }
+
+			   HELPER::printStatus('Signing not available, will be skipped.');
+
+			   // Remove designed profile file for signing to be able to rename raw one
+			   @unlink($files->outfile);
+			   if(rename($files->infile, $files->outfile))
+			   {
+				   HELPER::printStatus('Unsigned profile successfully generated');
+			   }
+			   else
+			   {
+				   die('Unsigned profile could not be created');
+			   }
+		   }
+	   }
 		
-	}
-	elseif(is_array(HELPER::checkDependencies($files, $xml)) && HELPER::checkDependencies($files, $xml)[0])
-	{
-		// At least one of the files necessary to sign is missing. Skip signing.
-		// Remove profile-sig.mobileconfig
-		@unlink($files->outfile);
-		// Use unsigned profile instead
-		if(rename($files->infile, $files->outfile))
-		{
-			HELPER::printStatus('Unsigned profile successfully generated');
-		}
-	}
-	else
-	{
-		// Check returns false. Necessary file profile.mobileconfig could not be created or content could not be written
-		HELPER::printStatus('Error while generating profile');
-	}
-	
-	HELPER::printStatus('Signed profile successfully generated');
+
 	HELPER::printStatus('<span style="font-size:10px">If download does not start within 10 seconds try this <a href="download.php"><strong>direct link</strong></a></span>');
-	
+
 	ob_end_flush();
 ?>
