@@ -111,17 +111,49 @@
 			var_dump($var);
 			echo '</pre>';
 		}
-
-
+		
+		
+		/*
+		 *
+		 * Print current status message with a short delay
+		 *
+		 *
+		 */
 		public static function printStatus($status)
 		{
 			echo $status . "<br /> ";
 		    echo str_pad('',4096)."\n";
 		    ob_flush();
 		    flush();
-		    sleep(1);
+		    //sleep(1);
 		}
-	
+
+		/*
+		 *
+		 * Print current debug message if enabled in config.general.php
+		 *
+		 *
+		 */
+		
+		public static function debug($status)
+		{
+			if(config::$debug)
+			{
+				echo '<strong>'.$status . "</strong><br /> ";
+				echo str_pad('',4096)."\n";
+				ob_flush();
+				flush();
+				//sleep(1);
+			}
+		}
+
+		/*
+		 *
+		 * Adding style information after header was sent by PHP
+		 *
+		 *
+		 */
+		
 		public static function addCSS()
 		{
 			echo <<< END
@@ -133,57 +165,52 @@
 END;
 		}
 		
-		public static function checkDependencies($files, $xml)
+		
+		/*
+		 * Function to check all dependencies relevant for creating the profile
+		 * @param		object			$files				Contains all relevant file names
+		 *
+		 *
+		 *
+		 */
+		
+		
+		public static function checkDependencies($files)
 		{
-			if(is_null($xml) || $xml == "")
-			{
-				return array(false, 'xml');
-			}
-			
-			// If infile not exists yet it will be created
+
 			// If writing content into it fails the profile is invalid (empty)
-			if(file_put_contents($files->infile, $xml) === false)
+			self::debug('Raw file is prepared');
+			if(file_put_contents($files->infile, '') === false)
 			{
 				// Content of profile xml could not be written into file
-				return array(false, $files->infile);
+				return array(false, 'infile');
 			}
-		
-			// Check if outfile exists
-			if(!file_exists($files->outfile))
+			// else everything's fine
+			
+			self::debug('Designed file is prepared');
+			if(file_put_contents($files->outfile, '') === false)
 			{
-				// If no it will be created
-				if(file_put_contents($files->outfile, '') === false)
-				{
-					// File not exists. It is necessary for download.php to work. It needs to exist.
-					return array(true, $files->outfile);
-				}
-				// else everything's fine
+				// File not exists. Only an unsigned profile is possible.
+				return array(true, 'outfile');
 			}
+			// else everything's fine
 		
+			self::debug('Check certificate files');
 			foreach(array($files->signcert, $files->privkey, $files->extracerts) as $file)
 			{
 				// Check if one of the files necessary to sign is missing
 				if(!file_exists($file))
 				{
 					// If yes profile can't be signed, so there's no need to check the rest of the files
-					$noCert = true;
-					printStatus('The following file necessary to sign the profile is missing: ' . $file);
-					printStatus('Profile signing will be skipped');
-					return array(true, $file);
+					//self::printStatus('The following file necessary to sign the profile is missing: ' . $file);
+					//self::printStatus('Profile signing will be skipped');
+					return array(true, pathinfo($file, PATHINFO_BASENAME));
 				}
 				// else continue checking remaining files
 			}
 			// Everything's fine, all dependecies exist
 			return true;
 		}
-
-
-
-
-
-
-
-
 
 
 }
