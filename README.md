@@ -15,3 +15,6 @@ To get signed profiles you need three more steps:
 7. Add certificate chain **ca-bundle.pem** to /data/certs/
 8. Add private key **key.pem** to /data/certs/
 9. Now you're ready for signed profiles
+
+**Please note that all certificate files exist already but they are invalid (no valid content)!**
+Either you fill them with valid content or you rename / remove them. Otherwise you won't get a readable profile!
