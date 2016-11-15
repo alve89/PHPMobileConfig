@@ -2,6 +2,9 @@
 
 	abstract class config
 	{
+		// Enable debug mode
+		public static $debug = true;
+		
 		// Use SSL for the site
 		protected static $siteUseSSL = false;
 		
