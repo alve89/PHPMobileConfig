@@ -15,6 +15,7 @@
 	require_once('classes/class.mail.php');
 	require_once('classes/class.caldav.php');
 	require_once('classes/class.carddav.php');
+	require_once('classes/class.wifi.php');
 	require_once('classes/class.addaccounts.php');
 	require_once('config/config.addTheseAccounts.php');
 
