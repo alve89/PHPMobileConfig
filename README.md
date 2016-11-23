@@ -22,6 +22,7 @@ To get signed profiles you need three more steps:
 Either you fill them with valid content or you rename / remove them. Otherwise you won't get a readable profile!
 
 **Not all options are available yet**
+
 Only the following are included in the current version:
 1. Wifi
 2. CalDAV
