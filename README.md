@@ -24,7 +24,7 @@ Either you fill them with valid content or you rename / remove them. Otherwise y
 **Not all options are available yet**
 
 Only the following are included in the current version:
-1. Wifi
-2. CalDAV
-3. CardDAV
-4. Mail
+* Wifi
+* CalDAV
+* CardDAV
+* Mail
