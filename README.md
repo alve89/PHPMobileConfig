@@ -17,6 +17,13 @@ To get signed profiles you need three more steps:
 9. Now you're ready for signed profiles
 
 ## Notes
-**Please note that all certificate files exist already but they are invalid (no valid content)!**
+**Please note that all certificate files already exist but they are invalid (no valid content)!**
 
 Either you fill them with valid content or you rename / remove them. Otherwise you won't get a readable profile!
+
+**Not all options are available yet**
+Only the following are included in the current version:
+1. Wifi
+2. CalDAV
+3. CardDAV
+4. Mail
