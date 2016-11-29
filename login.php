@@ -7,11 +7,13 @@
 		$pw = $_POST['pw'];
 		// Authenticate your user here
 		#
-		# 
+		# @param 	$uid	string	Username, given by form
+		# @param	$pw		string	Password, given by form
+		# @param	$auth	boolean	Contains the result of authentication
 		# $auth = anyAuthFunction($uid, $pw);
 		#
 		#
-		$auth = @imap_open("{w013e4e2.kasserver.com:143}", $_POST['uid'].'@die-herzogs.com', $_POST['pw'], OP_HALFOPEN);
+		
 		if($auth !== false)
 		{
 			$_SESSION = $_POST;
