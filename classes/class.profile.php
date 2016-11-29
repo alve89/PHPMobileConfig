@@ -9,6 +9,7 @@ class profile extends config
 	private $mails		= array();
 	private $caldavs	= array();
 	private $carddavs	= array();
+	private $wifis		= array();
 
 	
 	public function __construct($user, $accounts)
@@ -28,7 +29,12 @@ class profile extends config
 			{
 				$this->carddavs[] = $account;
 			}
+			elseif(is_a($account, 'wifi'))
+			{
+				$this->wifis[] = $account;
+			}
 		}
+		
 		$this->user					= $user;
 		
 		$this->profile				= new stdClass;
@@ -60,21 +66,28 @@ class profile extends config
 		return $this;
 	}
 	
-	private function wifi($ssid, $key, $encryption = 'WPA')
+	private function wifi()
 	{
-		$wifi = "<dict>
+		if(!isset($this->wifi->encryption) || is_null($this->wifi->encryption) || $this->wifi->encryption == "")
+		{
+			$this->wifi->encryption = 'WPA';
+		}
+		
+
+		$wifi = "
+				<dict>
 					<key>AutoJoin</key>
 					<true/>
 					<key>EncryptionType</key>
-					<string>$encryption</string>
+					<string>".$this->wifi->encryption."</string>
 					<key>HIDDEN_NETWORK</key>
 					<false/>
 					<key>Password</key>
-					<string>$key</string>
+					<string>".$this->wifi->key."</string>
 					<key>PayloadDescription</key>
 					<string>Verbindungseinstellungen für drahtloses Netzwerk konfigurieren.</string>
 					<key>PayloadDisplayName</key>
-					<string>Wi-Fi ($ssid)</string>
+					<string>Wi-Fi (".$this->wifi->ssid.")</string>
 					<key>PayloadIdentifier</key>
 					<string>".$this->identifier().".wifi</string>
 					<key>PayloadOrganization</key>
@@ -88,7 +101,7 @@ class profile extends config
 					<key>ProxyType</key>
 					<string>None</string>
 					<key>SSID_STR</key>
-					<string>$ssid</string>
+					<string>".$this->wifi->ssid."</string>
 				</dict>";
 		$this->controlProfileContainsData = true;
 				return $wifi;
@@ -96,19 +109,32 @@ class profile extends config
 	
 	private function caldav()
 	{
-		$caldav = "<dict>
+
+		if(!isset($this->caldav->user) || is_null($this->caldav->user) || $this->caldav->user == "")
+		{
+			$this->caldav->user = $this->user->username;
+		}
+		
+		
+		if(!isset($this->caldav->password) || is_null($this->caldav->password) || $this->caldav->password == "")
+		{
+			$this->caldav->password = $this->user->password;
+		}
+
+		$caldav = "
+					<dict>
 						<key>CalDAVAccountDescription</key>
 						<string>".$this->profile->desc.": Kalender</string>
 						<key>CalDAVHostName</key>
 						<string>".$this->caldav->host."</string>
 						<key>CalDAVPassword</key>
-						<string>".$this->user->password."</string>
+						<string>".$this->caldav->password."</string>
 						<key>CalDAVPort</key>".
 						$this->returnValue($this->caldav->port)."
 						<key>CalDAVUseSSL</key>".
 						$this->returnValue($this->caldav->useSSL)."
 						<key>CalDAVUsername</key>
-						<string>".$this->user->username."</string>
+						<string>".$this->caldav->user."</string>
 						<key>PayloadDescription</key>
 						<string>CalDAV-Account konfigurieren</string>
 						<key>PayloadDisplayName</key>
@@ -143,14 +169,22 @@ class profile extends config
 												<key>OutgoingPasswordSameAsIncomingPassword</key>
 												<false/>";
 		}
-		
-		// Check if mail account username matches user' username
-		// Configurable in /config/config.general.php
-		if(config::$mailMailUserMatchesUsername)
+
+		if(!isset($this->mail->incoming->user) || is_null($this->mail->incoming->user) || $this->mail->incoming->user == "")
 		{
-			$this->mail->incoming->username = $this->user->username;
-			$this->mail->outgoing->username = $this->user->username;
+			$this->mail->incoming->user = $this->user->username;
 		}
+		
+		if(!isset($this->mail->outgoing->password) || is_null($this->mail->outgoing->password) || $this->mail->outgoing->password == "")
+		{
+			$this->mail->outgoing->password = $this->user->password;
+		}
+		
+		if(!isset($this->mail->email) || is_null($this->mail->email) || $this->mail->email == "")
+		{
+			$this->mail->email = $this->user->email;
+		}
+		
 		
 		if(!empty($this->aliases))
 		{
@@ -160,7 +194,8 @@ class profile extends config
 		}
 		
 		
-		$mail = "<dict>
+		$mail = "
+					<dict>
 						<key>EmailAccountDescription</key>
 						<string>".$this->profile->desc.": Email</string>
 						<key>EmailAccountName</key>
@@ -168,7 +203,7 @@ class profile extends config
 						<key>EmailAccountType</key>
 						<string>EmailTypeIMAP</string>
 						<key>EmailAddress</key>
-						<string>".$this->user->email."</string>
+						<string>".$this->mail->email."</string>
 						<key>IncomingMailServerAuthentication</key>
 						<string>EmailAuthPassword</string>
 						<key>IncomingMailServerHostName</key>
@@ -178,7 +213,7 @@ class profile extends config
 						<key>IncomingMailServerUseSSL</key>".
 						$this->returnValue($this->mail->incoming->useSSL)."
 						<key>IncomingMailServerUsername</key>
-						<string>".$this->mail->incoming->username."</string>
+						<string>".$this->mail->incoming->user."</string>
 						<key>IncomingPassword</key>
 						<string>".$this->mail->incoming->password."</string>
 						<key>OutgoingMailServerAuthentication</key>
@@ -190,9 +225,9 @@ class profile extends config
 						<key>OutgoingMailServerUseSSL</key>".
 						$this->returnValue($this->mail->outgoing->useSSL)."
 						<key>OutgoingMailServerUsername</key>
-						<string>".$this->mail->outgoing->username."</string>
-						".$this->mail->outgoing->password.
-						"<key>PayloadDescription</key>
+						<string>".$this->mail->outgoing->user."</string>
+						".$this->mail->outgoing->password."
+						<key>PayloadDescription</key>
 						<string>E-Mail-Account konfigurieren.</string>
 						<key>PayloadDisplayName</key>
 						<string>IMAP-Account (Firmenaccount)</string>
@@ -212,20 +247,32 @@ class profile extends config
 	}
 	
 	private function carddav()
-	{		
-		$carddav = "<dict>
+	{
+		if(!isset($this->carddav->user) || is_null($this->carddav->user) || $this->carddav->user == "")
+		{
+			$this->carddav->user = $this->user->username;
+		}
+		
+		
+		if(!isset($this->carddav->password) || is_null($this->carddav->password) || $this->carddav->password == "")
+		{
+			$this->carddav->password = $this->user->password;
+		}
+		
+		$carddav = "
+					<dict>
 						<key>CardDAVAccountDescription</key>
 						<string>".$this->profile->desc.": Kontakte</string>
 						<key>CardDAVHostName</key>
 						<string>".$this->carddav->host."</string>
 						<key>CardDAVPassword</key>
-						<string>".$this->user->password."</string>
+						<string>".$this->carddav->password."</string>
 						<key>CardDAVPort</key>".
 						$this->returnValue($this->carddav->port)."
 						<key>CardDAVUseSSL</key>".
 						$this->returnValue($this->carddav->useSSL)."
 						<key>CardDAVUsername</key>
-						<string>".$this->user->username."</string>
+						<string>".$this->carddav->user."</string>
 						<key>PayloadDescription</key>
 						<string>CardDAV-Accounts konfigurieren</string>
 						<key>PayloadDisplayName</key>
@@ -249,7 +296,8 @@ class profile extends config
 	protected function certificate($name, $cert, $type, $pw = null)
 	{
 		$cert = file_get_contents($cert);
-		$certificate = "<dict>
+		$certificate = "
+						<dict>
 							<key>PayloadCertificateFileName</key>
 							<string>wlan.h-da.de.cer</string>
 							<key>PayloadContent</key>
@@ -308,17 +356,17 @@ class profile extends config
 			{
 				$value = 'false';
 			}
-			$value = "\n<".$value."/>";
+			$value = "\n						<".$value."/>";
 		}
 		// Return integer
 		elseif(is_int($value))
 		{
-			$value = "\n<integer>$value</integer>";
+			$value = "\n						<integer>$value</integer>";
 		}
 		// Return string
 		elseif(is_string($value))
 		{
-			$value	= "\n<string>$value</string>";
+			$value	= "\n						<string>$value</string>";
 		}
 		else
 		{
@@ -337,7 +385,7 @@ class profile extends config
 			die('Fehler bei Key: ' . $key);
 		}
 		
-		$key	= "<key>$key</key>\n";
+		$key	= "\n						<key>$key</key>";
 
 		return $key.$value;
 	}
@@ -345,11 +393,11 @@ class profile extends config
 	public function get_xml()
 	{
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>
-				<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-				<plist version="1.0">'."
-				<dict>
-					<key>PayloadContent</key>
-						<array>";
+		<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+		<plist version="1.0">'."
+		<dict>
+			<key>PayloadContent</key>
+				<array>";
 						// CalDAV
 						foreach($this->caldavs as &$this->caldav)
 						{
@@ -368,17 +416,25 @@ class profile extends config
 							$xml .= $this->mail($this->mail);
 						}
 						
+						// WLAN
+						
+						foreach($this->wifis as &$this->wifi)
+						{
+							$xml .= $this->wifi($this->wifi);
+						}
+						
 						// WLANs
 
 						// Apple: Einschränkungen
 						
 						// Apple: Code
 
-					$xml .="</array>".
+					$xml .="</array>
+					".
 					// Notwendige allgemeine Informationen
 						$this->relevantData().
-				"</dict>".
-				"</plist>";
+				"</dict>
+				</plist>";
 		if(!$this->controlProfileContainsData)
 		{
 			return false;

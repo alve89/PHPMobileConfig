@@ -1,16 +1,24 @@
 <?php
-
-	// Redirect to ssl encrypted address if current address is only http
-	// Use useSSL in config to deactivate this
-	if($config->site->useSSL && !isset($_SERVER['HTTPS']))
-	{
-		header("Location: https://" . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] . $_SERVER['QUERY_STRING']);
-	}
+	session_start();
+	// Include all relevant dependencies
+	require_once('config/config.general.php');
+	require_once('classes/class.helper.php');	
 	
+	// Redirect to ssl encrypted address if available and current address is only http
+	// Use $siteUseSSL in config to deactivate this
+	if(config::$siteUseSSL && !isset($_SERVER['HTTPS']))
+	{
+		// Only redirects if all tests are passed, otherwise it just continues
+		require_once('ssl.php');
+	}
+
+	// If no user details are set redirect to login page; use current protocol
+	if(empty($_SESSION))
+	{
+		header("Location: " . HELPER::setURL(HELPER::getCurrentProtocol(), 'login.php'));
+	}
 
 	// Include all necessary files
-	require_once('config/config.general.php');
-	require_once('classes/class.helper.php');
 	require_once('classes/class.user.php');
 	require_once('classes/class.mail.php');
 	require_once('classes/class.caldav.php');
@@ -20,12 +28,13 @@
 	require_once('config/config.addTheseAccounts.php');
 
 	// Create relevant instances
-	$user = new stdClass;	// Contains all relevant user information
+	$user = new user;	// Contains all relevant user information
+
 	// Fill object with information
 	require_once('config/config.getUser.php');
 	
 	// Add all accounts configured in config.addTheseAccounts.php
-	$accounts = new addTheseAccounts;
+	$accounts = new addTheseAccounts($user);
 
 	// Array contains all dynamically generated UUIDs to prevent duplicates
 	$uuid_array = array();	// This needs to be placed before profile.php

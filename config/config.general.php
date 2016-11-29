@@ -6,7 +6,7 @@
 		public static $debug = true;
 		
 		// Use SSL for the site
-		protected static $siteUseSSL = false;
+		public static $siteUseSSL = true;
 		
 		// Configure organization information
 		protected static $organizationIdentifier	= 'MYORGANIZATIONNAME';

@@ -12,7 +12,7 @@
 		
 		protected function addAccounts()
 		{
-			foreach($this->accountsToAdd as $account)
+			foreach($this->getAccountsToAdd() as $account)
 			{
 				$this->accounts[] = new $account['accountName']($account['configuration']);
 			}

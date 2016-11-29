@@ -8,12 +8,16 @@
 		public $name;
 		public $email;
 		
-		public function __construct()
+		public function __set($name, $value)
+		{
+			$this->$name = $value;
+			return $this->$name;
+		}
+		
+		public function createUser()
 		{
 			$this->name = $this->firstname . ' ' . $this->lastname;
 			return $this;
 		}
-
-
-}
+	}
 ?>

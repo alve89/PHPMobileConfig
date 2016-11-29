@@ -213,7 +213,128 @@ END;
 		}
 
 
+		/**
+		 * getHTTPStatusCode
+		 *
+		 * @param array $headers as in $http_response_header
+		 * @return array status and headers grouped by response, last first
+		 */
+		public static function getHTTPStatusCode($url)
+		{
+			$options['http'] = array(
+			    'method' => "HEAD",
+			    'ignore_errors' => 1,
+			);
+			$context = stream_context_create($options);
+			$body = @file_get_contents($url, NULL, $context);
+			$headers = $http_response_header;
+
+		    $responses = array();
+		    $buffer = NULL;
+		    foreach ($headers as $header)
+		    {
+		        if ('HTTP/' === substr($header, 0, 5))
+		        {
+		            // add buffer on top of all responses
+		            if ($buffer) array_unshift($responses, $buffer);
+		            $buffer = array();
+		
+		            list($version, $code, $phrase) = explode(' ', $header, 3) + array('', FALSE, '');
+		
+		            $buffer['status'] = array(
+		                'line' => $header,
+		                'version' => $version,
+		                'code' => (int) $code,
+		                'phrase' => $phrase
+		            );
+		            $fields = &$buffer['fields'];
+		            $fields = array();
+		            continue;
+		        }
+		        list($name, $value) = explode(': ', $header, 2) + array('', '');
+		        // header-names are case insensitive
+		        $name = strtoupper($name);
+		        // values of multiple fields with the same name are normalized into
+		        // a comma separated list (HTTP/1.0+1.1)
+		        if (isset($fields[$name]))
+		        {
+		            $value = $fields[$name].','.$value;
+		        }
+		        $fields[$name] = $value;
+		    }
+		    unset($fields); // remove reference
+		    array_unshift($responses, $buffer);
+
+			$code = $responses[0]['status']['code']; // last status code
+			/*
+				// Status code (after all redirects)
+				echo $code . "<br />";
+				// Number of responses
+				$number = count($responses);
+				echo $number . "<br />";
+				// Number of redirects
+				$redirects = $number - 1;
+				echo $redirects . "<br />";
+			
+				if ($redirects)
+				{
+				    $from = $url;
+				
+				    foreach (array_reverse($responses) as $response)
+				    {
+				        if (!isset($response['fields']['LOCATION']))
+				            break;
+				        $location = $response['fields']['LOCATION'];
+				        $code = $response['status']['code'];
+				
+				        echo " * $from -- $code --> $location<br>\n";
+				        $from = $location;
+				    }
+				    echo "<br>\n";
+				}
+			*/
+
+			return $code;	// returns only the status code
+		    //return $responses;	// returns the whole response
+		}
+
+		
+		public static function setURL($protocol, $file = null, $params = null)
+		{
+
+			//$_SERVER['REQUEST_URI'];	// dir + file
+			//$_SERVER['QUERY_STRING'];	// GET parameters
+			//$_SERVER['HTTP_HOST']; // domain
+			if(substr($protocol,-3) != '://')
+			{
+				$protocol .= '://';
+			}
+			$query = explode('&', $_SERVER['QUERY_STRING']);
+			(empty($query[0])) ? $query = array() : $query;
+			(is_null($params)) ? $params = array() : $params;
+			$params = array_merge($params, $query);
+			(empty($params)) ? $query = '' : $query = '?'.http_build_query($params);
+			
+			$domain = $_SERVER['HTTP_HOST']; // domain
+			$dir = pathinfo($_SERVER['REDIRECT_URL'])['dirname'];	// dir
+			// Check if there's a relative directory path
+			(empty($dir) || $dir == '/') ? $dir=DIRECTORY_SEPARATOR : $dir.=DIRECTORY_SEPARATOR;
+			(is_null($file)) ? $file = pathinfo($_SERVER['REDIRECT_URL'])['basename'] : $file;	// file
+
+			return $protocol.$domain.$dir.$file.$query;
+		}
+
+
+
+
+
+
+
+
+
 }
+
+
 
 
 

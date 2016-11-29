@@ -7,10 +7,10 @@
 	
 		public function __construct($config)
 		{
-			$this->host		= $config['host'];
-			$this->port		= $config['port'];
-			$this->useSSL	= $config['useSSL'];
-
+			foreach($config as $key => $value)
+			{
+				$this->$key = $value;
+			}
 			return $this;
 		}
 	}

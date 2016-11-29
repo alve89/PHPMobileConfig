@@ -1,23 +1,19 @@
 <?php
-	// Your user might be authenticated against MySQL database and filled out a login form
-	$usernameFromLoginForm = 'myUserName';
+	require_once('lib/hSys/framework.php');	
+
+	$user->username = $_SESSION['uid'];
+	$user->password = $_SESSION['pw'];
+
+	// Get additional user details from database
+	$_DB->select('*')
+		->from('#_users')
+		->where('username', '=', $user->username)
+		->query();
+	$res = $_DB->fetch('object')[0];
 	
-	// Your user information might be loaded from a MySQL database
-	// "SELECT * FROM `users` WHERE 'username' = $usernameFromLoginForm";
+	$user->firstname = $res->firstname;
+	$user->lastname = $res->lastname;
+	$user->email = $res->email;
 	
-	// Apply result from MySQL to object $user
-	// If you filled mySQLResultAsObject from database, it's automatically an object (when fetching an object).
-	$mySQLResultAsObject = new stdClass;  // This line is only for testing purposes to not overwrite already in index.php defined $user and have not an object anymore.
-	// Variable name needs to be $user!!!
-	$user = $mySQLResultAsObject;;
-	
-	/*
-	 *	This might contain:
-	 *
-	 *	$user->username = 'myUserName';
-	 *	$user->password = 'myPassword';
-	 *	$user->firstname= 'myFirstname';
-	 *	$user->lastname = 'myLastname';
-	 *	$user->email	= 'myFirstname@myLastnam.tld';
-	 *
-	 */
+	// Generate missing information automatically
+	$user->createUser();
