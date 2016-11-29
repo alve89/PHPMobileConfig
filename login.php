@@ -10,6 +10,7 @@
 		# @param 	$uid	string	Username, given by form
 		# @param	$pw		string	Password, given by form
 		# @param	$auth	boolean	Contains the result of authentication
+		# 
 		# $auth = anyAuthFunction($uid, $pw);
 		#
 		#
