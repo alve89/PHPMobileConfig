@@ -16,14 +16,14 @@
 			$this->accountsToAdd = array(
 
 									array('accountName' => 'caldav',
-								  		'configuration' => array('host' => 'cloud.die-herzogs.com',
+								  		'configuration' => array('host' => 'caldav.myHost.tld',
 								  								 'user' => $this->user->username,
 								  								 'password' => $this->user->password,
 																 'port' => 443,
 																 'useSSL' => true)
 								  		),
 									  array('accountName' => 'carddav',
-								  		'configuration' => array('host' => 'cloud.die-herzogs.com',
+								  		'configuration' => array('host' => 'carddav.myHost.tld',
 								  								 'user' => $this->user->username,
 								  								 'password' => $this->user->password,
 																 'port' => 443,
@@ -32,12 +32,12 @@
 
 
 									  array('accountName' => 'mail',
-								  		'configuration' => array('incomingHost' => 'w013e4e2.kasserver.com',
+								  		'configuration' => array('incomingHost' => 'imap.myHost.tld',
 								  								 'incomingUser' => $this->user->email,
 								  								 'incomingPassword' => $this->user->password,
 																 'incomingPort' => 993,
 																 'incomingUseSSL' => true,
-																 'outgoingHost' => 'w013e4e2.kasserver.com',
+																 'outgoingHost' => 'smtp.myHost.tld',
 																 'outgoingUser' => $this->user->email,
 																 'outgoingPassword' => $this->user->password,
 																 'outgoingPort' => 465,
@@ -47,8 +47,8 @@
 								  		
 /*
 								  	  array('accountName' => 'wifi',
-								  			'configuration' => array('ssid' => 'ntwAlSt9289',
-								  									'key' => 'ThpVh6JZ8JWNcpCAD6gSfaaHawjbfDmY'
+								  			'configuration' => array('ssid' => 'anyWifiSSID',
+								  									'key' => 'thisIsTheKey'
 								  								)
 								  		),
 */

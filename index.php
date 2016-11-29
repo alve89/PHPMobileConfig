@@ -173,4 +173,3 @@
 	HELPER::printStatus('<span style="font-size:10px">If download does not start within 10 seconds try this <a href="download.php"><strong>direct link</strong></a></span>');
 
 	ob_end_flush();
-?>
