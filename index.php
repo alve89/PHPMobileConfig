@@ -59,7 +59,15 @@
 	elseif(HELPER::client() === 'other')
 	{
 		// Anything different than Apple devices
-		goto other;
+		if(config::$enableProfileDownloadForNonAppleUsers)
+		{
+			goto apple;
+		}
+		else
+		{
+			goto other;
+		}
+		//goto other;
 		//goto apple;
 	}
 	else
@@ -67,8 +75,6 @@
 		// An error message just for sure
 		die('You use an unknown device, please contact the administrator');
 	}
-
-
 	other:	// shows users data
 	header('Content-Type: text/html; charset=UTF-8');
  	require_once('config/config.displayThisToNonAppleUsers.php');
