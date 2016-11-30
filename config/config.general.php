@@ -8,6 +8,9 @@
 		// Use SSL for the site
 		public static $siteUseSSL = true;
 		
+		// Enable profile download on Non Apple Devices
+		public static $enableProfileDownloadForNonAppleUsers = true;	// on false you can define what the user should see. Configuration in  	config.displayThisToNonAppleUsers.php
+		
 		// Configure organization information
 		protected static $organizationIdentifier	= 'MYORGANIZATIONNAME';
 		protected static $organizationFullName		= 'MYORGANIZATIONFULLNAME';
