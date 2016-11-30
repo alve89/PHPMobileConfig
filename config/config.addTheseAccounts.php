@@ -3,16 +3,15 @@
 	{
 		private $accountsToAdd = array();
 		private $user;
+
+		protected function getAccountsToAdd()
+		{
 		/*
 		 *
 		 * BEGIN CONFIGURATION
 		 *
 		 */
 		// Add here all accounts you want to add to the profile
-		protected function getAccountsToAdd()
-		{
-			
-		
 			$this->accountsToAdd = array(
 
 									array('accountName' => 'caldav',
@@ -53,6 +52,21 @@
 								  		),
 */
 
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 			
 		/*
 		 *
