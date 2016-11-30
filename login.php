@@ -1,16 +1,23 @@
 <?php
 	session_start();
-	
+
+	// Load necessary files
+	require_once('classes/class.helper.php');
+	require_once('classes/class.auth.php');
+	require_once('interfaces/interface.authConfig.php');
+
+
 	// The following if-clause is needed for testing purposes. It's false in release packages.
-	if(file_exists($incFile = 'test/class.auth.php'))
+	if(file_exists($incFile = 'test/config.authenticationBackends.php'))
 	{
 		require_once($incFile);
 	}
+	else
+	{
+		require_once('config/config.authenticationBackends.php');
+	}
 	
-	// Necessary classes
-	require_once('classes/class.helper.php');
-	require_once('classes/class.auth.php');
-	
+
 	// Check if $uid and $pw are set
 	if(isset($_POST['uid']) && isset($_POST['pw']))
 	{
@@ -18,10 +25,10 @@
 		$pw = $_POST['pw'];
 		
 		// Authenticate user
-		$auth = auth::authUser($uid, $pw);
+		$auth = new auth;
 		
 		// If authentication was successful redirect user to profile download
-		if($auth !== false)
+		if($auth->authUser($uid, $pw) !== false)
 		{
 			$_SESSION = $_POST;
 			header("Location: " . HELPER::setURL(HELPER::getCurrentProtocol(), 'index.php'));
