@@ -7,7 +7,7 @@ The profiles work on iPod, iPhone, iPad, Mac.
 2. Configure /config/config.general.php
 3. Add your routines to retrieve user details to /config/config.getUser.php
 4. Add all accounts you want to be included within the profile in /config/config.addTheseAccounts.php
-5. Add your routines to /classes/class.auth.php to authenticate your users
+5. Add your routines to /config/config.authenticationBackends.php to authenticate your users
 6. You're ready to go for an unsigned profile
 7. If you additionally want to display non-Apple-device-users their user details, edit [index.php](https://github.com/alve89/PHPMobileConfig/blob/master/index.php#L74_L85)
 
