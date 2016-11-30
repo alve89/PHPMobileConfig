@@ -59,8 +59,8 @@
 	elseif(HELPER::client() === 'other')
 	{
 		// Anything different than Apple devices
-		//goto other;
-		goto apple;
+		goto other;
+		//goto apple;
 	}
 	else
 	{
@@ -71,18 +71,7 @@
 
 	other:	// shows users data
 	header('Content-Type: text/html; charset=UTF-8');
-	/*
-	 *
-	 *
-	 *	PRINT WHAT EVER YOU WANT, e.g.
-	 *	echo 'username: ' . $user->username;
-	 *	echo 'firstname: ' . $user->firstname;
-	 *	.
-	 *	.
-	 *	.
-	 *
-	 *
-	 */
+ 	require_once('config/config.displayThisToNonAppleUsers.php');
 	exit;
 
 
