@@ -10,10 +10,18 @@
 	 */
 
 	// Parent class that is called
-	class auth
+	class auth implements IAuthConfig
 	{
+		private $authBackends;
+
+		public function addBackend(IAuthConfig $backend)
+		{
+			$this->authBackends[] = $backend;
+		}
+		
 		public function authUser($uid, $pw)
 		{
+/*			
 			$classes = get_declared_classes();
 
 			foreach($classes as $class)
@@ -24,15 +32,16 @@
 					$children[] = $class;
 				}
 			}
-
-			foreach($children as $class)
+*/
+			foreach($this->authBackends as $backend)
 			{
-				$auth = new $class;
-				if($return = $auth->authBackend($uid, $pw))
+				//$auth = new $class;
+				if($backend->authUser($uid, $pw))
 				{
-					break;
+					return true;
 				}
 			}
-			return $return;
+			
+			return false;
 		}
 	}
