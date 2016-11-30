@@ -6,7 +6,7 @@
 	// Get additional user details from database
 	#
 	#
-	# $res is the result of a MySQL query as an object to get user details
+	# $res is here e.g. the result of a MySQL query as an object to get user details
 	
 	$user->firstname = $res->firstname;
 	$user->lastname = $res->lastname;

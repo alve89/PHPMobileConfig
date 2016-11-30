@@ -9,7 +9,7 @@
 	if(config::$siteUseSSL && !isset($_SERVER['HTTPS']))
 	{
 		// Only redirects if all tests are passed, otherwise it just continues
-		require_once('ssl.php');
+		require_once('inc.ssl.php');
 	}
 
 	// If no user details are set redirect to login page; use current protocol
@@ -31,7 +31,15 @@
 	$user = new user;	// Contains all relevant user information
 
 	// Fill object with information
-	require_once('config/config.getUser.php');
+	if(file_exists($incFile = 'test/config.getUser.php'))
+	{
+		// For testing purposes
+		require_once($incFile);
+	}
+	else
+	{
+		require_once('config/config.getUser.php');
+	}
 	
 	// Add all accounts configured in config.addTheseAccounts.php
 	$accounts = new addTheseAccounts($user);
