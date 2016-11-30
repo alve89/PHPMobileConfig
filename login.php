@@ -1,11 +1,13 @@
 <?php
 	session_start();
 
-	// Load necessary files
+	// Necessary files
+	require_once('interfaces/interface.authConfig.php');
 	require_once('classes/class.helper.php');
 	require_once('classes/class.auth.php');
-	require_once('interfaces/interface.authConfig.php');
 
+	// Instantiate class auth before loading authBackends from config.authenticationBackends.php
+	$auth = new auth;
 
 	// The following if-clause is needed for testing purposes. It's false in release packages.
 	if(file_exists($incFile = 'test/config.authenticationBackends.php'))
@@ -24,8 +26,6 @@
 		$uid = $_POST['uid'];
 		$pw = $_POST['pw'];
 		
-		// Authenticate user
-		$auth = new auth;
 		
 		// If authentication was successful redirect user to profile download
 		if($auth->authUser($uid, $pw) !== false)
