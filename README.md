@@ -3,7 +3,7 @@ A PHP library to dynamically generate configuration profiles for Apple devices.
 The profiles work on iPod, iPhone, iPad, Mac.
 
 ## Installation
-See [Wiki: Installation & configuration](https://github.com/alve89/PHPMobileConfig/wiki/Installation-and-configuration)
+See [Wiki: Installation & configuration](https://github.com/alve89/PHPMobileConfig/wiki/Installation-&-configuration)
 
 ## Notes
 **Please note that all certificate files already exist but they are invalid (no valid content)!**
