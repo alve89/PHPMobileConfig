@@ -6,6 +6,9 @@
 		
 		public function __construct($config)
 		{
+			$this->email	= $config['email'];
+			$this->desc		= $config['desc'];
+			$this->name		= $config['name'];
 			$this->incoming = new stdClass;
 			$this->incoming->host		= $config['incomingHost'];
 			$this->incoming->port		= $config['incomingPort'];

@@ -325,7 +325,18 @@ END;
 		}
 
 
-
+		public static function getCurrentProtocol()
+		{
+			if(isset($_SERVER['HTTPS']))
+			{
+				$protocol = 'https';
+			}
+			else
+			{
+				$protocol = 'http';
+			}
+			return $protocol;
+		}
 
 
 
@@ -337,3 +348,5 @@ END;
 
 
 
+
+?>

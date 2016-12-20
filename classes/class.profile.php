@@ -36,15 +36,29 @@ class profile extends config
 		}
 		
 		$this->user					= $user;
-		
-		$this->profile				= new stdClass;
-		$this->profile->name		= config::$profileName;
-		$this->profile->identifier	= config::$profileIdentifier;
-		$this->profile->desc		= config::$profileDesc;
 
 		$this->organization			= new stdClass;
 		$this->organization->fullName = config::$organizationFullName;
 		$this->organization->identifier = config::$organizationIdentifier;
+
+		
+		$this->profile				= new stdClass;
+		$this->profile->desc		= config::$profileDesc;
+		
+		if(!isset(config::$profileName) || is_null(config::$profileName) || config::$profileName == "")
+		{
+			$this->profile->name = str_replace(' ', '_', $this->organization->fullName.'-'.$this->user->lastname.'_'.$this->user->firstname);
+		}
+		
+
+		if(!isset(config::$profileIdentifier) || is_null(config::$profileIdentifier) || config::$profileIdentifier == "")
+		{
+			$this->profile->identifier = strtolower(str_replace(' ', '_', $this->organization->fullName.'.'.$this->user->lastname.'_'.$this->user->firstname));
+		}
+
+
+
+
 
 		if(is_null($this->profile->name))
 		{
@@ -120,11 +134,17 @@ class profile extends config
 		{
 			$this->caldav->password = $this->user->password;
 		}
+		
+		
+		if(!isset($this->caldav->desc) || is_null($this->caldav->desc) || $this->caldav->desc == "")
+		{
+			$this->caldav->desc = $this->profile->desc . ': Kalender';
+		}
 
 		$caldav = "
 					<dict>
 						<key>CalDAVAccountDescription</key>
-						<string>".$this->profile->desc.": Kalender</string>
+						<string>".$this->caldav->desc."</string>
 						<key>CalDAVHostName</key>
 						<string>".$this->caldav->host."</string>
 						<key>CalDAVPassword</key>
@@ -185,6 +205,17 @@ class profile extends config
 			$this->mail->email = $this->user->email;
 		}
 		
+		if(!isset($this->mail->desc) || is_null($this->mail->desc) || $this->mail->desc == "")
+		{
+			$this->mail->desc = $this->profile->desc . ': Email';
+		}
+
+		
+		if(!isset($this->mail->name) || is_null($this->mail->name) || $this->mail->name == "")
+		{
+			$this->mail->name = $this->user->name;
+		}
+
 		
 		if(!empty($this->aliases))
 		{
@@ -197,9 +228,9 @@ class profile extends config
 		$mail = "
 					<dict>
 						<key>EmailAccountDescription</key>
-						<string>".$this->profile->desc.": Email</string>
+						<string>".$this->mail->desc."</string>
 						<key>EmailAccountName</key>
-						<string>".$this->user->name."</string>
+						<string>".$this->mail->name."</string>
 						<key>EmailAccountType</key>
 						<string>EmailTypeIMAP</string>
 						<key>EmailAddress</key>
@@ -258,11 +289,17 @@ class profile extends config
 		{
 			$this->carddav->password = $this->user->password;
 		}
+				
+		
+		if(!isset($this->carddav->desc) || is_null($this->carddav->desc) || $this->carddav->desc == "")
+		{
+			$this->carddav->desc = $this->profile->desc . ': Kontakte';
+		}
 		
 		$carddav = "
 					<dict>
 						<key>CardDAVAccountDescription</key>
-						<string>".$this->profile->desc.": Kontakte</string>
+						<string>".$this->carddav->desc."</string>
 						<key>CardDAVHostName</key>
 						<string>".$this->carddav->host."</string>
 						<key>CardDAVPassword</key>
