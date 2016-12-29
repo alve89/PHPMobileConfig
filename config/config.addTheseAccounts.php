@@ -40,7 +40,11 @@
 																 'outgoingUser' => $this->user->email,
 																 'outgoingPassword' => $this->user->password,
 																 'outgoingPort' => 465,
-																 'outgoingUseSSL' => true
+																 'outgoingUseSSL' => true,
+																 // OPTIONAL:
+																 'mail' => 'myMail@myHost.tld',
+																 'desc' => 'Description for this account',
+																 'name' => 'Firstname Lastname'
 																)
 								  		),
 								  		
