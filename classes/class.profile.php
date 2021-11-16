@@ -11,7 +11,22 @@ class profile extends config
 	private $carddavs	= array();
 	private $wifis		= array();
 
-	
+	static public function generateRandomString($length = 32, $symbols = false, $numbers = true, $letters_lc = true, $letters_uc = true) {
+		$characters = '';
+
+		if($numbers) $characters .= '0123456789';
+		if($letters_lc) $characters .= 'abcdefghijklmnopqrstuvwxyz';
+		if($letters_uc) $characters .= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		if($symbols) $characters .= ',.-;:_!%()=?@{}[]$#+*`"';
+
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+				$randomString .= $characters[rand(0, strlen($characters) - 1)];
+		}
+		return $randomString;
+	}
+
+
 	public function __construct($user, $accounts)
 	{
 		$accounts = $accounts->getAccounts();
@@ -34,22 +49,22 @@ class profile extends config
 				$this->wifis[] = $account;
 			}
 		}
-		
+
 		$this->user					= $user;
 
 		$this->organization			= new stdClass;
 		$this->organization->fullName = config::$organizationFullName;
 		$this->organization->identifier = config::$organizationIdentifier;
 
-		
+
 		$this->profile				= new stdClass;
 		$this->profile->desc		= config::$profileDesc;
-		
+
 		if(!isset(config::$profileName) || is_null(config::$profileName) || config::$profileName == "")
 		{
 			$this->profile->name = str_replace(' ', '_', $this->organization->fullName.'-'.$this->user->lastname.'_'.$this->user->firstname);
 		}
-		
+
 
 		if(!isset(config::$profileIdentifier) || is_null(config::$profileIdentifier) || config::$profileIdentifier == "")
 		{
@@ -74,19 +89,19 @@ class profile extends config
 		{
 			$this->profile->desc = $this->organization->fullName;
 		}
-		
+
 		$this->controlProfileContainsData = false;
-		
+
 		return $this;
 	}
-	
+
 	private function wifi()
 	{
 		if(!isset($this->wifi->encryption) || is_null($this->wifi->encryption) || $this->wifi->encryption == "")
 		{
 			$this->wifi->encryption = 'WPA';
 		}
-		
+
 
 		$wifi = "
 				<dict>
@@ -103,7 +118,7 @@ class profile extends config
 					<key>PayloadDisplayName</key>
 					<string>Wi-Fi (".$this->wifi->ssid.")</string>
 					<key>PayloadIdentifier</key>
-					<string>".$this->identifier().".wifi</string>
+					<string>".$this->identifier().".wifi.".str_replace(' ', '_', $this->wifi->ssid)."__".profile::generateRandomString(16)."</string>
 					<key>PayloadOrganization</key>
 					<string>".$this->organization->fullName."</string>
 					<key>PayloadType</key>
@@ -120,7 +135,7 @@ class profile extends config
 		$this->controlProfileContainsData = true;
 				return $wifi;
 	}
-	
+
 	private function caldav()
 	{
 
@@ -128,14 +143,14 @@ class profile extends config
 		{
 			$this->caldav->user = $this->user->username;
 		}
-		
-		
+
+
 		if(!isset($this->caldav->password) || is_null($this->caldav->password) || $this->caldav->password == "")
 		{
 			$this->caldav->password = $this->user->password;
 		}
-		
-		
+
+
 		if(!isset($this->caldav->desc) || is_null($this->caldav->desc) || $this->caldav->desc == "")
 		{
 			$this->caldav->desc = $this->profile->desc . ': Kalender';
@@ -172,11 +187,11 @@ class profile extends config
 					</dict>";
 		$this->controlProfileContainsData = true;
 		return $caldav;
-		
+
 	}
-	
+
 	private function mail()
-	{		
+	{
 		if($this->mail->incoming->password === $this->mail->outgoing->password)
 		{
 			$this->mail->outgoing->password = "<key>OutgoingPasswordSameAsIncomingPassword</key>
@@ -194,37 +209,37 @@ class profile extends config
 		{
 			$this->mail->incoming->user = $this->user->username;
 		}
-		
+
 		if(!isset($this->mail->outgoing->password) || is_null($this->mail->outgoing->password) || $this->mail->outgoing->password == "")
 		{
 			$this->mail->outgoing->password = $this->user->password;
 		}
-		
+
 		if(!isset($this->mail->email) || is_null($this->mail->email) || $this->mail->email == "")
 		{
 			$this->mail->email = $this->user->email;
 		}
-		
+
 		if(!isset($this->mail->desc) || is_null($this->mail->desc) || $this->mail->desc == "")
 		{
 			$this->mail->desc = $this->profile->desc . ': Email';
 		}
 
-		
+
 		if(!isset($this->mail->name) || is_null($this->mail->name) || $this->mail->name == "")
 		{
 			$this->mail->name = $this->user->name;
 		}
 
-		
+
 		if(!empty($this->aliases))
 		{
 			array_unshift($this->aliases, $email);
 			$email = implode(', ', $this->aliases);
 			unset($this->aliases);
 		}
-		
-		
+
+
 		$mail = "
 					<dict>
 						<key>EmailAccountDescription</key>
@@ -276,26 +291,26 @@ class profile extends config
 		$this->controlProfileContainsData = true;
 		return $mail;
 	}
-	
+
 	private function carddav()
 	{
 		if(!isset($this->carddav->user) || is_null($this->carddav->user) || $this->carddav->user == "")
 		{
 			$this->carddav->user = $this->user->username;
 		}
-		
-		
+
+
 		if(!isset($this->carddav->password) || is_null($this->carddav->password) || $this->carddav->password == "")
 		{
 			$this->carddav->password = $this->user->password;
 		}
-				
-		
+
+
 		if(!isset($this->carddav->desc) || is_null($this->carddav->desc) || $this->carddav->desc == "")
 		{
 			$this->carddav->desc = $this->profile->desc . ': Kontakte';
 		}
-		
+
 		$carddav = "
 					<dict>
 						<key>CardDAVAccountDescription</key>
@@ -328,8 +343,8 @@ class profile extends config
 		$this->controlProfileContainsData = true;
 		return $carddav;
 	}
-	
-	
+
+
 	protected function certificate($name, $cert, $type, $pw = null)
 	{
 		$cert = file_get_contents($cert);
@@ -358,8 +373,8 @@ class profile extends config
 						</dict>";
 			return $certificate;
 	}
-	
-	
+
+
 	protected function relevantData()
 	{
 		$relevantData = $this->set_element('PayloadDescription', 'Dieses Profil konfiguriert und erstellt automatisch alle wichtigen Email-, Kalender- und Adressbuchaccounts.').
@@ -377,8 +392,8 @@ class profile extends config
 	{
 		return strtolower($this->profile->identifier);
 	}
-	
-	
+
+
 
 	private function returnValue($value)
 	{
@@ -413,7 +428,7 @@ class profile extends config
 		return $value;
 
 	}
-	
+
 	private function set_element($key,$value)
 	{
 
@@ -421,12 +436,12 @@ class profile extends config
 		{
 			die('Fehler bei Key: ' . $key);
 		}
-		
+
 		$key	= "\n						<key>$key</key>";
 
 		return $key.$value;
 	}
-	
+
 	public function get_xml()
 	{
 		$xml = '<?xml version="1.0" encoding="UTF-8"?>
@@ -440,30 +455,30 @@ class profile extends config
 						{
 							$xml .= $this->caldav($this->caldav);
 						}
-		
+
 						// CardDAV
 						foreach($this->carddavs as &$this->carddav)
 						{
 							$xml .= $this->carddav($this->carddav);
 						}
-		
+
 						// Mail
 						foreach($this->mails as &$this->mail)
 						{
 							$xml .= $this->mail($this->mail);
 						}
-						
+
 						// WLAN
-						
+
 						foreach($this->wifis as &$this->wifi)
 						{
 							$xml .= $this->wifi($this->wifi);
 						}
-						
+
 						// WLANs
 
 						// Apple: Einschränkungen
-						
+
 						// Apple: Code
 
 					$xml .="</array>
@@ -478,10 +493,7 @@ class profile extends config
 		}
 		else
 		{
-			return $xml;			
+			return $xml;
 		}
 	}
 }
-
-
-
